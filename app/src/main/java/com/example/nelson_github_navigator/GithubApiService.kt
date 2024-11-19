@@ -1,6 +1,6 @@
 package com.example.nelson_github_navigator
 
-import com.example.nelson_github_navigator.ui.viewmodel.GithubApiService
+//import com.example.nelson_github_navigator.ui.viewmodel.GithubApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -9,6 +9,9 @@ import retrofit2.http.Path
 interface GithubApiService {
     @GET("users/{username}")
     suspend fun getUserInfo(@Path("username") username: String): GithubUser
+
+    @GET("users/{username}/repos")
+    suspend fun getUserRepos(@Path("username") username: String): List<GithubRepo>
 }
 
 object RetrofitInstance {

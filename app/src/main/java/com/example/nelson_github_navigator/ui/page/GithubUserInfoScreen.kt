@@ -10,13 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.nelson_github_navigator.ui.viewmodel.GithubUserInfoViewModel
 
 @Composable
-fun GithubUserInfoScreen(viewModel: GithubUserInfoViewModel) {
+fun GithubUserInfoScreen(viewModel: GithubUserInfoViewModel = viewModel(), navController: NavController) {
     var username by remember { mutableStateOf("") }
     val userInfo by viewModel.userInfo.observeAsState()
-    val context = LocalContext.current
+    val error by viewModel.error.observeAsState()
 
     Column(
         modifier = Modifier
@@ -38,6 +40,9 @@ fun GithubUserInfoScreen(viewModel: GithubUserInfoViewModel) {
             Text("Fetch User Info")
         }
         Spacer(modifier = Modifier.height(16.dp))
+        error?.let {
+            Text(it, color = MaterialTheme.colorScheme.error)
+        }
         userInfo?.let { user ->
             Text("Username: ${user.login}")
             Text("Name: ${user.name}")
@@ -45,9 +50,8 @@ fun GithubUserInfoScreen(viewModel: GithubUserInfoViewModel) {
             Text("Followers: ${user.followers}")
             Text("Following: ${user.following}")
             TextButton(onClick = {
-//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(user.repos_url))
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/orgs/huggingface/repositories"))
-                context.startActivity(intent)
+                viewModel.fetchUserRepos(user.login)
+                navController.navigate("userRepos/${user.login}")
             }) {
                 Text("Public Repos")
             }
